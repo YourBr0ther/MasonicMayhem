@@ -1,6 +1,10 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
+let wallSound = new Audio('wall_sound_effect.mp3');
+let blockSound = new Audio('wall_sound_effect.mp3');
+let paddleSound = new Audio('wall_sound_effect.mp3');
+
 let paddleWidth = 150;
 let paddleHeight = 10;
 let paddleX = (canvas.width - paddleWidth) / 2;
@@ -13,8 +17,17 @@ let ball = {
   y: canvas.height - 30,
   dx: 4,
   dy: -4,
-  radius: 10
+  width: 50, // Update to the actual width of the ball image
+  height: 50 // Update to the actual height of the ball image
 };
+
+let blockImage = new Image(); // Create an image object
+blockImage.src = 'block.png'; // Set the path to your block image file
+
+let ballImage = new Image(); // Create an image object
+ballImage.src = 'ball.png'; // Set the path to your ball image file
+
+let gameStarted = false; // Track if the game has started
 
 let brickRowCount = 10;  // Number of rows of bricks
 let brickColumnCount = 20;  // Number of columns of bricks
@@ -40,11 +53,7 @@ function drawBricks() {
         let brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
         bricks[c][r].x = brickX;
         bricks[c][r].y = brickY;
-        context.beginPath();
-        context.rect(brickX, brickY, brickWidth, brickHeight);
-        context.fillStyle = "#0095DD";
-        context.fill();
-        context.closePath();
+        context.drawImage(blockImage, brickX, brickY, brickWidth, brickHeight); // Draw the block image
       }
     }
   }
@@ -56,9 +65,13 @@ document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) {
   if (e.key == "Right" || e.key == "ArrowRight") {
     rightPressed = true;
-  }
-  else if (e.key == "Left" || e.key == "ArrowLeft") {
+  } else if (e.key == "Left" || e.key == "ArrowLeft") {
     leftPressed = true;
+  } else if (e.key == " ") { // Check for spacebar press
+    if (!gameStarted) { // Start the game if not already started
+      gameStarted = true;
+      draw(); // Start the game loop
+    }
   }
 }
 
@@ -80,11 +93,7 @@ function drawPaddle() {
 }
 
 function drawBall() {
-  context.beginPath();
-  context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  context.fillStyle = "#0095DD";
-  context.fill();
-  context.closePath();
+  context.drawImage(ballImage, ball.x, ball.y, ball.width, ball.height); // Draw the ball image
 }
 
 function updateBallPosition() {
@@ -92,19 +101,21 @@ function updateBallPosition() {
   ball.y += ball.dy;
 
   // Bounce off the left and right walls
-  if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
+  if (ball.x + ball.dx > canvas.width - ball.width || ball.x + ball.dx < ball.width) {
     ball.dx = -ball.dx;
+    wallSound.play(); // Play wall sound effect
   }
 
   // Bounce off the top wall
-  if (ball.y + ball.dy < ball.radius) {
+  if (ball.y + ball.dy < ball.width) {
     ball.dy = -ball.dy;
-  } else if (ball.y + ball.dy > canvas.height - ball.radius) {
+    wallSound.play();
+  } else if (ball.y + ball.dy > canvas.height - ball.width) {
     // Check if the ball hits the paddle
     if (
-      ball.x > paddleX - ball.radius &&
-      ball.x < paddleX + paddleWidth + ball.radius &&
-      ball.y + ball.dy > canvas.height - paddleHeight - ball.radius
+      ball.x > paddleX - ball.width &&
+      ball.x < paddleX + paddleWidth &&
+      ball.y + ball.dy > canvas.height - paddleHeight - ball.width
     ) {
       // Calculate the horizontal distance between the ball and the center of the paddle
       let paddleCenterX = paddleX + paddleWidth / 2;
@@ -114,6 +125,7 @@ function updateBallPosition() {
       ball.dx = distanceFromPaddleCenter * 0.2 + (Math.random() - 0.5) * 2;
 
       ball.dy = -Math.abs(ball.dy); // Reverse the vertical direction with absolute value to ensure upward motion
+      paddleSound.play();
     } else {
       // Game over logic
       console.log("GAME OVER");
@@ -128,13 +140,14 @@ function updateBallPosition() {
       let brick = bricks[c][r];
       if (brick.status === 1) {
         if (
-          ball.x + ball.radius > brick.x &&
-          ball.x - ball.radius < brick.x + brickWidth &&
-          ball.y + ball.radius > brick.y &&
-          ball.y - ball.radius < brick.y + brickHeight
+          ball.x + ball.width > brick.x &&
+          ball.x < brick.x + brickWidth &&
+          ball.y + ball.width > brick.y &&
+          ball.y < brick.y + brickHeight
         ) {
           ball.dy = -ball.dy;
           brick.status = 0;
+          blockSound.play();
         }
       }
     }
@@ -157,4 +170,11 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-draw();
+// Start the game loop when the page loads
+window.addEventListener("load", function () {
+  blockImage.onload = function () {
+    ballImage.onload = function () {
+      draw();
+    };
+  };
+});
