@@ -1,0 +1,24 @@
+{
+  "name": "masonicmayhem",
+  "version": "1.0.0",
+  "description": "a brick break clone",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YourBr0ther/MasonicMayhem.git"
+  },
+  "author": "YourBr0ther",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YourBr0ther/MasonicMayhem/issues"
+  },
+  "homepage": "https://github.com/YourBr0ther/MasonicMayhem#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "path": "^0.12.7"
+  }
+}
