@@ -145,7 +145,14 @@ function updateBallPosition() {
           ball.y + ball.width > brick.y &&
           ball.y < brick.y + brickHeight
         ) {
-          ball.dy = -ball.dy;
+          let brickCenterX = brick.x + brickWidth / 2;
+          let distanceFromBrickCenter = ball.x - brickCenterX;
+
+          ball.dy = -ball.dy; // Reverse the vertical direction
+
+          // Adjust the horizontal direction based on the distance from the center of the brick
+          ball.dx = distanceFromBrickCenter * 0.05;
+
           brick.status = 0;
           blockSound.play();
         }
@@ -160,7 +167,7 @@ function draw() {
   drawBall();
   drawPaddle();
   updateBallPosition();
-
+  
   if (rightPressed && paddleX < canvas.width - paddleWidth) {
     paddleX += 7;
   } else if (leftPressed && paddleX > 0) {
