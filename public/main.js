@@ -1,6 +1,27 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
+const startButton = document.getElementById('startButton');
+const startScreen = document.getElementById('startScreen');
+const gameContainer = document.getElementById('gameContainer');
+const spaceBarTitle = document.getElementById('spaceBarTitle');
+
+startButton.addEventListener('click', startGame);
+
+function startGame() {
+  startScreen.style.display = 'none'; // Hide the start screen
+  gameContainer.style.display = 'block'; // Show the game container
+  spaceBarTitle.style.display = 'block'; // Show the space bar title
+
+  document.addEventListener('keydown', handleKeyDown);
+  // Start your game logic here
+  blockImage.onload = function () {
+    ballImage.onload = function () {
+      draw();
+    };
+  };
+}
+
 let wallSound = new Audio('wall_sound_effect.mp3');
 let blockSound = new Audio('wall_sound_effect.mp3');
 let paddleSound = new Audio('wall_sound_effect.mp3');
@@ -70,6 +91,17 @@ function keyDownHandler(e) {
   } else if (e.key == " ") { // Check for spacebar press
     if (!gameStarted) { // Start the game if not already started
       gameStarted = true;
+      spaceBarTitle.style.display = 'none'; // Hide the space bar title
+      draw(); // Start the game loop
+    }
+  }
+}
+
+function handleKeyDown(e) {
+  if (e.key == ' ') { // Check for spacebar press
+    if (!gameStarted) { // Start the game if not already started
+      gameStarted = true;
+      spaceBarTitle.style.display = 'none'; // Hide the space bar title
       draw(); // Start the game loop
     }
   }
@@ -182,7 +214,7 @@ function draw() {
 window.addEventListener("load", function () {
   blockImage.onload = function () {
     ballImage.onload = function () {
-      draw();
+      startGame();
     };
   };
 });
