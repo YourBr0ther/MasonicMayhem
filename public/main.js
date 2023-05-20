@@ -117,12 +117,13 @@ function updateBallPosition() {
       ball.x < paddleX + paddleWidth &&
       ball.y + ball.dy > canvas.height - paddleHeight - ball.width
     ) {
+
       // Calculate the horizontal distance between the ball and the center of the paddle
       let paddleCenterX = paddleX + paddleWidth / 2;
       let distanceFromPaddleCenter = ball.x - paddleCenterX;
 
-      // Adjust the direction based on the distance from the center
-      ball.dx = distanceFromPaddleCenter * 0.2 + (Math.random() - 0.5) * 2;
+      // Keep the speed of the ball constant, but change the direction based on which side of the paddle it hits
+      ball.dx = Math.sign(distanceFromPaddleCenter) * Math.abs(ball.dx);
 
       ball.dy = -Math.abs(ball.dy); // Reverse the vertical direction with absolute value to ensure upward motion
       paddleSound.play();
@@ -167,7 +168,7 @@ function draw() {
   drawBall();
   drawPaddle();
   updateBallPosition();
-  
+
   if (rightPressed && paddleX < canvas.width - paddleWidth) {
     paddleX += 7;
   } else if (leftPressed && paddleX > 0) {
